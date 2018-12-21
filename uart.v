@@ -17,7 +17,7 @@
 
 module uart(clk,rst,rx,tx_data_in,start,rx_data_out,tx,tx_active,done_tx);
 
-parameter clk_freq = 32000000; //MHz
+parameter clk_freq = 50000000; //MHz
 parameter baud_rate = 19200; //bits per second
 parameter clock_divide = (clk_freq/baud_rate);
 
