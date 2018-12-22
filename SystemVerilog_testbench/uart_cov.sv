@@ -11,6 +11,10 @@ class uart_cov;
   RX_DOUT:coverpoint trans.rx_data_out {bins rx_dout_c = {[0:255]};}
   TX_ACT:coverpoint trans.tx_active {bins tx_act_c = {0,1};}
   DONE:coverpoint trans.done_tx {bins dtx_c = {0,1};}
+  
+  RXxRX_DOUT: cross RX,RX_DOUT;
+  TXxTX_DINxTX_ACTxDONE: cross TX,TX_DIN,TX_ACT,DONE;
+  STARTxTX_DIN: cross START,TX_DIN;
   endgroup 
 
   function new();
