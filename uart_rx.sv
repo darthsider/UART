@@ -28,9 +28,9 @@ localparam clock_divide = (clk_freq/baud_rate);
 
 enum bit [2:0] { rx_IDLE = 3'b000,
                  rx_START = 3'b001,
-		             rx_DATA = 3'b010,
-		             rx_STOP = 3'b011,
-		             rx_DONE = 3'b100 } rx_STATE, rx_NEXT;
+		 rx_DATA = 3'b010,
+		 rx_STOP = 3'b011,
+		 rx_DONE = 3'b100 } rx_STATE, rx_NEXT;
 					 
 logic [11:0] clk_div_reg,clk_div_next;
 logic [7:0] rx_data_reg,rx_data_next;
