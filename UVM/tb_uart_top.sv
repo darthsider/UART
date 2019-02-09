@@ -4,6 +4,8 @@
 `include "uart_sequence.sv"
 `include "uart_intf.sv"
 `include "uart_driver.sv"
+`include "uart_mon.sv"
+`include "uart_cov.sv"
 `include "uart_agent.sv"
 `include "uart_env.sv"
 `include "uart_test.sv"

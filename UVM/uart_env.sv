@@ -6,7 +6,7 @@
     
    uart_agent agent;
     
-    function new(string name, uvm_component parent);
+    function new(string name = "", uvm_component parent);
       super.new(name, parent);
     endfunction
  

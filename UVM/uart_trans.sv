@@ -21,6 +21,7 @@ import uvm_pkg::*;
       super.new(name);
     endfunction
     
+    /*
     function string convert2string;
       return $sformatf("\t start = %0b, \t tx_data_in = %0h,\t done_tx = %0b",start,tx_data_in,done_tx);
       return $sformatf("\t tx_active = %0b, \t rx_data_out = %0b",tx_active, rx_data_out);
@@ -53,6 +54,7 @@ import uvm_pkg::*;
       return status;
     endfunction
 
+*/
   endclass: uart_trans
 
 
