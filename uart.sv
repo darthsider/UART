@@ -15,22 +15,28 @@
  *
  */
 
-module uart(clk,rst,rx,tx_data_in,start,rx_data_out,tx,tx_active,done_tx);
-
-parameter clk_freq = 50000000;                  // Hz
-parameter baud_rate = 19200;                    // bits per second
-parameter data_bits = 8;                        // Range:5-9
-parameter parity_type = 0;                      // Range:0=None,1=Odd,2=Even
-parameter stop_bits = 1;                        // Range:1-2
-
-input clk,rst; 
-input rx;
-input [data_bits-1:0] tx_data_in;
-input start;
-output tx; 
-output [data_bits-1:0] rx_data_out;
-output tx_active;
-output done_tx;
+module uart #(
+    // Parameters
+    parameter clk_freq = 50000000,             // Hz
+    parameter baud_rate = 19200,               // bits per second
+    parameter data_bits = 8,                   // Range:5-9
+    parameter parity_type = 0,                 // Range:0=None,1=Odd,2=Even
+    parameter stop_bits = 1                    // Range:1-2
+    )(
+    // Outputs
+    output                 rx_data_vld,
+    output [data_bits-1:0] rx_data_out,
+    output                 parity_err,
+    output                 tx, 
+    output                 tx_active,
+    output                 done_tx,
+    // Inputs
+    input                  rx,
+    input [data_bits-1:0]  tx_data_in,
+    input                  start,
+    input                  rst,
+    input                  clk
+); 
 
 // Receiver
 uart_rx #(
@@ -40,7 +46,9 @@ uart_rx #(
     .clk(clk),
     .rst(rst),
     .rx(rx),
-    .rx_data_out(rx_data_out)
+    .rx_data_out(rx_data_out),
+    .rx_data_vld(rx_data_vld),
+    .parity_err(parity_err)
 );
 
 // Transmitter

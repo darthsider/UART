@@ -15,20 +15,23 @@
  *
  */
 
-module uart_rx(clk,rst,rx,rx_data_out,rx_data_vld,parity_err);
-
-parameter clk_freq = 50000000;                  // Hz
-parameter baud_rate = 19200;                    // bits per second
-parameter data_bits = 8;                        // Range:5-9
-parameter parity_type = 0;                      // Range:0=None,1=Odd,2=Even
-parameter stop_bits = 1;                        // Range:1-2
-
-input clk;
-input rst;
-input rx;
-output [data_bits-1:0] rx_data_out;
-output logic rx_data_vld;
-output logic parity_err;
+module uart_rx #(
+    // Parameters
+    parameter clk_freq = 50000000,             // Hz
+    parameter baud_rate = 19200,               // bits per second
+    parameter data_bits = 8,                   // Range:5-9
+    parameter parity_type = 0,                 // Range:0=None,1=Odd,2=Even
+    parameter stop_bits = 1                    // Range:1-2
+    )(
+    // Outputs
+    output [data_bits-1:0] rx_data_out,
+    output logic rx_data_vld,
+    output logic parity_err,
+    // Inputs
+    input rx,
+    input rst,
+    input clk
+);
 
 localparam clock_divide = (clk_freq/baud_rate);
 
@@ -37,7 +40,8 @@ enum bit [2:0] {
     rx_START = 3'b001,
     rx_DATA = 3'b010,
     rx_STOP = 3'b011,
-    rx_DONE = 3'b100 } rx_STATE, rx_NEXT;
+    rx_DONE = 3'b100,
+    rx_PARITY = 3'b101 } rx_STATE, rx_NEXT;
 					 
 logic [$clog2(clock_divide):0] clk_div_reg,clk_div_next;
 logic [data_bits-1:0] rx_data_reg,rx_data_next;
@@ -76,6 +80,8 @@ always_comb begin
         rx_IDLE: begin
             clk_div_next = 0;
             index_bit_next = 0;
+            parity_err_next = 1'b0;
+            rx_data_vld_next = 1'b0;
             if(rx == 0) begin
                 rx_NEXT = rx_START;
             end
@@ -117,23 +123,27 @@ always_comb begin
                     if(parity_type == 0) begin
                         rx_NEXT = rx_STOP;
                     end
-                    else if(parity_type == 1) begin
-                        rx_NEXT = rx_PARITY_ODD;
-                    end
-                    else if(parity_type == 2) begin
-                        rx_NEXT = rx_PARITY_EVEN;
+                    else begin
+                        rx_NEXT = rx_PARITY;
                     end
                 end
             end
         end
         
-        rx_PARITY_ODD: begin
+        rx_PARITY: begin
             if(clk_div_reg < clock_divide-1) begin
                 clk_div_next = clk_div_reg + 1'b1;
-                rx_NEXT = rx_PARITY_ODD;
+                rx_NEXT = rx_PARITY;
             end
             else begin
-                
+                clk_div_next = 0;
+                rx_NEXT = rx_STOP;
+                if(parity_type == 1) begin
+                    parity_err_next = (rx == ^rx_data_reg);
+                end
+                else if(parity_type == 2) begin
+                    parity_err_next = (rx == ~^rx_data_reg);
+                end
             end
         end
 
@@ -144,6 +154,7 @@ always_comb begin
             end
             else begin
                 clk_div_next = 0;
+                rx_data_vld_next = 1'b1;
                 rx_NEXT = rx_DONE;
             end
         end
