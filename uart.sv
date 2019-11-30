@@ -15,49 +15,53 @@
  *
  */
 
-module uart(clk,rst,rx,tx_data_in,start,rx_data_out,tx,tx_active,done_tx);
+module uart #(
+    // Parameters
+    parameter clk_freq = 50000000,             // Hz
+    parameter baud_rate = 19200,               // bits per second
+    parameter data_bits = 8,                   // Range:5-9
+    parameter parity_type = 0,                 // Range:0=None,1=Odd,2=Even
+    parameter stop_bits = 1                    // Range:1-2
+    )(
+    // Outputs
+    output                 rx_data_vld,
+    output [data_bits-1:0] rx_data_out,
+    output                 rx_parity_err,
+    output                 tx,
+    output                 tx_active,
+    // Inputs
+    input                  rx,
+    input [data_bits-1:0]  tx_data_in,
+    input                  tx_data_vld,
+    input                  rst,
+    input                  clk
+);
 
-parameter clk_freq = 50000000; //MHz
-parameter baud_rate = 19200; //bits per second
-parameter clock_divide = (clk_freq/baud_rate);
+// Receiver
+uart_rx #(
+    .clk_freq(clk_freq),
+    .baud_rate(baud_rate))
+    receiver(
+    .clk(clk),
+    .rst(rst),
+    .rx(rx),
+    .rx_data_out(rx_data_out),
+    .rx_data_vld(rx_data_vld),
+    .rx_parity_err(rx_parity_err)
+);
 
-  input clk,rst; 
-  input rx;
-  input [7:0] tx_data_in;
-  input start;
-  output tx; 
-  output [7:0] rx_data_out;
-  output tx_active;
-  output done_tx;
-	
-	
-uart_rx 
-       #(.clk_freq(clk_freq),
-	 .baud_rate(baud_rate)
-	)
-      receiver
-             (
-              .clk(clk),
-	      .rst(rst),
-	      .rx(rx),
-	      .rx_data_out(rx_data_out)
-             );
-
-
-uart_tx 
-       #(.clk_freq(clk_freq),
-	 .baud_rate(baud_rate)
-        )
-      transmitter			 
-               (               
-                .clk(clk),
-		.rst(rst),
-		.start(start),
-		.tx_data_in(tx_data_in),
-		.tx(tx),
-		.tx_active(tx_active),
-		.done_tx(done_tx)
-               );
+// Transmitter
+uart_tx #(
+    .clk_freq(clk_freq),
+    .baud_rate(baud_rate))
+    transmitter(
+    .clk(clk),
+    .rst(rst),
+    .tx_data_vld(tx_data_vld),
+    .tx_data_in(tx_data_in),
+    .tx(tx),
+    .tx_active(tx_active)
+);
 
 endmodule
 

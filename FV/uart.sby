@@ -1,0 +1,39 @@
+#    Symbiyosys configuration file for formal testbench
+#    Copyright (C) 2019 Rijurekh Bose
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+[options]
+mode bmc
+depth 200
+
+[engines]
+smtbmc
+
+[script]
+read -formal fv_uart.sv uart.sv uart_tx.sv uart_rx.sv 
+prep -top fv_uart
+
+[file fv_uart.svh]
+`define CLK_FREQ 307200
+`define BAUD_RATE 19200
+`define DATA_BITS 8
+`define PARITY_TYPE 0
+`define STOP_BITS 1
+
+[files]
+fv_uart.sv
+../uart_rx.sv
+../uart_tx.sv
+../uart.sv
