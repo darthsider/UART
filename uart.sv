@@ -26,17 +26,16 @@ module uart #(
     // Outputs
     output                 rx_data_vld,
     output [data_bits-1:0] rx_data_out,
-    output                 parity_err,
-    output                 tx, 
+    output                 rx_parity_err,
+    output                 tx,
     output                 tx_active,
-    output                 done_tx,
     // Inputs
     input                  rx,
     input [data_bits-1:0]  tx_data_in,
-    input                  start,
+    input                  tx_data_vld,
     input                  rst,
     input                  clk
-); 
+);
 
 // Receiver
 uart_rx #(
@@ -48,21 +47,20 @@ uart_rx #(
     .rx(rx),
     .rx_data_out(rx_data_out),
     .rx_data_vld(rx_data_vld),
-    .parity_err(parity_err)
+    .rx_parity_err(rx_parity_err)
 );
 
 // Transmitter
 uart_tx #(
     .clk_freq(clk_freq),
     .baud_rate(baud_rate))
-    transmitter(               
+    transmitter(
     .clk(clk),
     .rst(rst),
-    .start(start),
+    .tx_data_vld(tx_data_vld),
     .tx_data_in(tx_data_in),
     .tx(tx),
-    .tx_active(tx_active),
-    .done_tx(done_tx)
+    .tx_active(tx_active)
 );
 
 endmodule
